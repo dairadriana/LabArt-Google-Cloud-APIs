@@ -11,7 +11,7 @@ from vision_detect_colors import detect_properties
 from vision_detect_faces import detect_faces
 from vision_detect_logos import detect_logos
 from Faces.face_detection import detect_face_in_realtime 
-from Faces.vision_face_detection_real_time import detect_faces_mixed
+from Faces.vision_face_detection_real_time import draw_faces_emotions_realtime
 
 square_size = 256
 
@@ -30,7 +30,7 @@ image_png_counter = 0
 frame_set = []
 start_time = time.time()
 
-detect_face_in_realtime()
+draw_faces_emotions_realtime()
 
 # Cambiar a while true para hacer el ciclo bucle
 while image_png_counter < 1:
