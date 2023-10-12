@@ -1,4 +1,7 @@
-def detect_faces(path):
+import cv2
+from google.cloud import vision
+
+def detect_faces_mixed(path):
     """Detects faces in an image."""
     from google.cloud import vision
 

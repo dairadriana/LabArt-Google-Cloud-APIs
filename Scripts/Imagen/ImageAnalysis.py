@@ -10,7 +10,8 @@ from vision_detect_labels import detect_labels
 from vision_detect_colors import detect_properties
 from vision_detect_faces import detect_faces
 from vision_detect_logos import detect_logos
-from face_detection import detect_face_in_realtime
+from Faces.face_detection import detect_face_in_realtime 
+from Faces.vision_face_detection_real_time import detect_faces_mixed
 
 square_size = 256
 
@@ -60,15 +61,3 @@ while image_png_counter < 1:
         image_png_counter += 1
         start_time = time.time()
     image_counter += 1
-
-
-# Quitar comentario para correr en API
-# response = openai.Image.create_variation(
-#    image = open("Test_Image_Square_0.png", "rb"),
-#    n=1,
-#    size="256x256"
-#)
-#url = response["data"][0]["url"]
-#urllib.request.urlretrieve(url, "Test_Image_Square_0_API.png")
-#img = Image.open(r"Test_Image_Square_0_API.png")
-#img.save('API_Result.png')
