@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "incubadora-arte-y-tec",
+  "private_key_id": "e0a1f15abd629a340ccbe5e7f88e96a4133599af",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC1fLSbIgMhJubB\nCcnS4ruK+eFEn3JYI8cMyWHnzSu6gPnKnMzT/I4aNn73DKRKzI0SLnu1abfDg04y\nbfN7L4yINhac26Y91TOgnc4UxgnW947eYcZf4VvGh3dJsG8tCIiLCK/B9VWsz0u0\nkb6iDngIdZUmyUmw/6Xe+eatPLgIF0ysocYHKe+letGyqowVrdbKsZPSnKkWWyiK\nEbeNsIoiCKowvqYrnGlMnHrX2wG4Ezh1AOpOYrUvtIQ+OdDpqA1gI80ZAh8RIMDk\nP5Eqem0dvuuSS7/y9HKSvXUskuN0Z3KQPrXGsMKIkrDYhL/xthBgKk+s0nWkkyEo\n9F//oBwnAgMBAAECggEATmqUqtcWXROu7seo8brP5+uyHvF5+YVz8x1sdTjcZRhn\nVdlMU2gzijXzxBEtR7h8V9fH0gncwdiRSA7j/lz8LrqYKKxrdxoQ1Zx5t9Yd2Elc\n7M94ZGM+QVi0/R0D3IRsYw6cyoSTwThMcLfsk58G1Djh+kFM2vKLG/4EYuPybGPS\nQShYOg5i+5GcG0hSX2sj1ew5PLpxefS2ucyzQ9k8Zz6zk5LVuc3f3obqSwzknZlV\nKeqxqyGO6hWEJpuQe3O2FMC1/N0D8U6N1U5dFmjbgmC5BpQU5+6MRL9AeruhVr8W\nSZglL9dQwaaS9HhGrlvdxUilxyFRjX9udLu1ZVs6UQKBgQDkmNCSrNuj+gFMUZsi\nug9IAHwd+ig6jEPI44V2Z7PjfyXzmLT8Ow7Yw9wwN78dcEUj6mbRpCrvizEInQq9\nB8cJ45jPuuAUd57ZMnvOBn1wFNY0EsnkUrZCUa0PqvqlPHcBOox6Qoyelpct7LG9\neqAUDSkAsxlpbky4D6TmN6FVOQKBgQDLPi9DejaZnhJBFpAED7Xs2MN1RsLLBSrC\nZTeigClTqs3bwcYn2ZyetxFOGziLSlPos6WptA1IADwUMjI5EygxmRFOjif29fN/\nbCapbnJDOSEGxYQWJ3CIg5ICGNLC90TFsdCn4DSEMycJNV3e1K+zP5wEoy1dn5jZ\n8OOMiilcXwKBgEqiTe6leyyFUmktd54V6ylR5zQOWZYL95GeHxPydbv/5k8q+2Qi\nkA1bnQctHDurTReVzy4BEHeXFVI/m6Lt6CElat3foItuJrG5FszEN64hT3I+9CWU\nj6cFbaBg7WaHYD9Jc1XzZl/cwM0gq0M2xw7k4Q82akSO24N4sBjt7sGZAoGBAMiR\n1oytt+JDh1oqTPdlFbDlfYZnzWYS9E6hGpVICwChZ8P953J+IzzSBsbgwB1dvY7A\ncrUVlaG/cYqwurVufVTs7JJsYW4q7CCMd17vOt2yLDCFjUNbqodd6CIfoyZ6ZKkA\nQJza+piX7mb8/mUf2UB4fpxo+CUTkgFJ4xVXZ1fbAoGBAN8SAEcv7ldRLypek0sM\nM07mPeErdpVFV+ZeA9eknXlDNPfX9LMvHhT34VPUl6ojYEBmlJ9YeaH7ZkSl3DgA\nwiCQ6oWXFntwQ8WLIq9JpqI+i8lWBFF09c0WfQuCoifoYziNJ6ILqsuFGidjCgP9\nQ1uJCRKkWR5S5Vt0f6vZaxWS\n-----END PRIVATE KEY-----\n",
+  "client_email": "a1029fya@incubadora-arte-y-tec.iam.gserviceaccount.com",
+  "client_id": "102793533380768376591",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/a1029fya%40incubadora-arte-y-tec.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
