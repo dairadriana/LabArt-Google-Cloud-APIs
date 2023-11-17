@@ -2,7 +2,6 @@ import openai
 import cv2
 import os
 import time
-import urllib.request
 from PIL import Image
 from google.cloud import vision_v1
 from google.cloud.vision_v1 import types
@@ -18,10 +17,6 @@ square_size = 256
 # Cliente de visión AI
 client = vision_v1.ImageAnnotatorClient()
 
-# API de OpenAI - DALL-E
-api_key = "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"
-openai.api_key = api_key
-
 cam = cv2.VideoCapture(0)
 cam.set(3, 640)
 cam.set(4, 480)
@@ -33,13 +28,13 @@ start_time = time.time()
 draw_faces_emotions_realtime()
 
 # Cambiar a while true para hacer el ciclo bucle
-while image_png_counter < 1:
+while True:
     ret, frame = cam.read()
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     cv2.imshow('frame', frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
-    if time.time() - start_time >= 5: #<---- cada 5 segundos
+    if time.time() - start_time >= 1: #<---- cada 5 segundos
         img_name = "Test_Image_{}.png".format(image_png_counter)
         cv2.imwrite(img_name, frame)
         #detect_properties(img_name)
