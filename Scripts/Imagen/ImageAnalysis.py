@@ -1,4 +1,4 @@
-import openai
+import threading
 import cv2
 import os
 import time
@@ -25,6 +25,15 @@ image_png_counter = 0
 frame_set = []
 start_time = time.time()
 
+# Función para detectar emociones en un HILO SEPARADO (threads)
+def detect_emotions_thread(img_name):
+    detect_faces(img_name)
+
+# Iniciar la detección de emociones en un hilo separado
+def start_emotion_detection(img_name):
+    emotion_thread = threading.Thread(target=detect_emotions_thread, args=(img_name,))
+    emotion_thread.start()
+
 draw_faces_emotions_realtime()
 
 # Cambiar a while true para hacer el ciclo bucle
@@ -39,7 +48,7 @@ while True:
         cv2.imwrite(img_name, frame)
         #detect_properties(img_name)
         #detect_labels(img_name)
-        detect_faces(img_name)
+        # detect_faces(img_name)
 
         # Cortar la imagen en formato cuadrado
         #im = Image.open('Test_Image_{}.png'.format(image_png_counter))
