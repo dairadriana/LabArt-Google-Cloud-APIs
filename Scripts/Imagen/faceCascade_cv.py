@@ -95,7 +95,7 @@ while True:
         # Verificar si hay una emoción detectada
         if emotion_result is not None:
             # Agregar la emoción debajo del cuadrado verde
-            text = f"Emoción: {emotion_result['emotion']}" if 'emotion' in emotion_result else "No se detectó emoción"
+            text = f"Emoción: {emotion_result['emotion']}" if 'emotion' in emotion_result else "No se detectó emocion"
             cv2.putText(frame, text, (x, y + h + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
 
     # Mostrar el frame con los rectángulos y texto en la ventana
