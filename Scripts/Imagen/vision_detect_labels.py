@@ -16,13 +16,13 @@ def detect_labels(path):
     image = vision.Image(content=content)
 
     response = client.label_detection(image=image)
-    labels = response.label_annotations
-    print("Labels:")
 
-    for label in labels:
-        print(label.description)
-        retrieve_from_google(label.description, 1)
-        time.sleep(1)
+    labels = [label.description for label in response.label_annotations]
+    query_Google = ' '.join(labels)
+    print("Query: ", query_Google)
+
+    retrieve_from_google(query_Google, 1)
+    time.sleep(1)
 
     if response.error.message:
         raise Exception(
