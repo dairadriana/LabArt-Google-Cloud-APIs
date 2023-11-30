@@ -1,63 +1,112 @@
 import cv2
 import numpy as np
+import threading
+import time
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
+import speech_recognition as sr
 
-# Cargar el modelo preentrenado
+# Load the pretrained model
 model = load_model('C:\\Users\\tokyo\\Desktop\\Programming\\LabArt-Google-Cloud-APIs\\modelo_emociones.h5')
 
-# Crear una lista de emociones
-emotions = ["Enojo", "Asco", "Miedo", "Feliz", "Neutral", "Triste", "Sorpresa"]
+# Create a list of emotions
+emotions = ["ANGRY", "DISGUST", "FEAR", "HAPPY", "NEUTRAL", "SAD", "SURPRISE"]
 
-# Iniciar el clasificador de caras de OpenCV
+# Initialize the OpenCV face classifier
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
-# Iniciar la captura de la cámara web
+# Initialize the webcam capture
 cap = cv2.VideoCapture(0)
 
-while True:
-    # Capturar un frame
-    ret, frame = cap.read()
+# Initialize the SpeechRecognition recognizer
+recognizer = sr.Recognizer()
 
-    # Convertir a escala de grises
+# Variable para almacenar el texto reconocido
+recognized_text = ""
+
+# Set the font and color
+font = cv2.FONT_HERSHEY_COMPLEX_SMALL
+color = (0, 204, 0)  # White color in RGB
+
+# Función para realizar el reconocimiento de emociones
+def recognize_emotion(frame):
+    # Convert to grayscale
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    # Detectar caras en la imagen
+    # Detect faces in the image
     faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
 
     for (x, y, w, h) in faces:
-        # Extraer la región de interés (ROI) correspondiente a la cara detectada
+        # Extract the region of interest (ROI) corresponding to the detected face
         roi = gray[y:y + h, x:x + w]
 
-        # Redimensionar la imagen a las dimensiones esperadas por el modelo
+        # Resize the image to the dimensions expected by the model
         roi = cv2.resize(roi, (48, 48))
 
-        # Normalizar la imagen
+        # Normalize the image
         roi = roi / 255.0
 
-        # Expandir las dimensiones para que coincidan con las dimensiones de entrada del modelo
+        # Expand dimensions to match the input dimensions of the model
         roi = np.expand_dims(roi, axis=0)
         roi = np.expand_dims(roi, axis=-1)
 
-        # Hacer la predicción
+        # Make the prediction
         prediction = model.predict(roi)[0]
 
-        # Obtener la emoción predicha
+        # Get the predicted emotion
         predicted_emotion = emotions[np.argmax(prediction)]
 
-        # Dibujar un cuadrado morado alrededor del rostro detectado
+        # Draw a purple rectangle around the detected face
         cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 255), 2)
 
-        # Mostrar la emoción predicha en el frame
-        cv2.putText(frame, predicted_emotion, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 0, 255), 2)
+        # Display the detected emotion with customized text settings
+        cv2.putText(frame, f"Emotion detected: {predicted_emotion}", (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 255), 2)
 
-    # Mostrar el frame
+# Función para realizar la transcripción de audio
+def transcribe_audio():
+    global recognized_text
+
+    while True:
+        # Use SpeechRecognition to perform speech-to-text in English and Spanish
+        with sr.Microphone() as source:
+            try:
+                audio_data = recognizer.listen(source, timeout=5)
+                recognized_text = recognizer.recognize_google(audio_data, language=['en-US', 'es-ES'])
+            except sr.UnknownValueError:
+                pass  # Ignore if no speech is detected
+            except sr.RequestError as e:
+                print(f"Error with the speech recognition service; {e}")
+
+# Iniciar el hilo para la transcripción de audio
+audio_thread = threading.Thread(target=transcribe_audio)
+audio_thread.start()
+
+while True:
+    # Capture a frame
+    ret, frame = cap.read()
+
+    # Verify if the frame was captured successfully
+    if not ret:
+        print("Error capturing the frame.")
+        break
+
+    # Realizar el reconocimiento de emociones en un hilo separado
+    emotion_thread = threading.Thread(target=recognize_emotion, args=(frame,))
+    emotion_thread.start()
+
+    # Mostrar el texto reconocido en la pantalla
+    cv2.putText(frame, f"Speech: {recognized_text}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
+
+    # Esperar a que el hilo de emociones termine antes de mostrar el siguiente frame
+    emotion_thread.join()
+
+    # Show the frame
     cv2.imshow('Emotion Detection', frame)
 
-    # Salir del bucle si se presiona la tecla 'q'
+    # Exit the loop if the 'q' key is pressed
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-# Liberar la cámara y cerrar la ventana
+# Release the webcam and close the window
 cap.release()
 cv2.destroyAllWindows()
