@@ -55,6 +55,9 @@ def detect_labels(path):
 def retrieve_from_google(query, limit):
     folder_path = os.path.join(os.getcwd(), "Images")
 
+    # Limpiar imágenes antiguas
+    clear_images(folder_path)
+
     gis = GoogleImagesSearch('AIzaSyBm-zMIEyDd-9cyf3kzRbLCPdRit4hhjqs', 'd445dfdd970e94217')
     _search_params = {
         'q': query,
@@ -73,6 +76,16 @@ def retrieve_from_google(query, limit):
     canvas.create_image(500, 0, anchor=tk.NW, image=img_google_tk)
     canvas.image = img_google_tk
 
+def clear_images(folder_path):
+    # Eliminar todas las imágenes en el directorio
+    for file_name in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, file_name)
+        try:
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+        except Exception as e:
+            print(f"Error al eliminar {file_path}: {e}")
+
 def update_image():
     # Mostrar el frame de la webcam en el lienzo de Tkinter
     ret, frame = cam.read()
@@ -84,17 +97,13 @@ def update_image():
     canvas.img_tk = img_tk
 
 def analyze_image():
-    global image_png_counter
     global start_time
 
-    img_name = "Test_Image_{}.png".format(image_png_counter)
+    img_name = "Test_Image.png"
     ret, frame = cam.read()
     cv2.imwrite(img_name, frame)
     threading.Thread(target=detect_labels, args=(img_name,)).start()
-    os.remove(img_name)
     print("{} analyzed!".format(img_name))
-
-    image_png_counter += 1
     start_time = time.time()
 
     # Programar la próxima ejecución del análisis después de un intervalo de tiempo
