@@ -150,15 +150,9 @@ def retrieve_from_google(query, limit):
         # Redimensionar la imagen
         img_pil = img_pil.resize((new_width, 250), Image.BILINEAR)
 
-        # Calcular posición aleatoria en el lienzo
-        img_width = screen_width // 2
-        img_height = screen_height
         img_x = random.randint(0, screen_width - new_width)
         img_y = random.randint(0, screen_height - new_height)
 
-        # Mostrar la imagen en el lienzo de Tkinter
-        img_google = Image.open(image_path)
-        img_google = img_google.resize((img_width, img_height))
         img_google_tk = ImageTk.PhotoImage(img_pil)
 
         canvas.create_image(img_x, img_y, anchor=tk.NW, image=img_google_tk)
