@@ -49,6 +49,12 @@ query_window.attributes('-fullscreen', True)
 
 # Configurar el fondo negro del widget de texto
 query_text = tk.Text(query_window, wrap=tk.WORD, width=screen_width, height=screen_height, bg='black', fg='green', font=('Arial', 14))
+# Crear un tag para el texto de labels (verde)
+query_text.tag_configure("labels_tag", foreground="green")
+
+# Crear un tag para el texto de logos (rosado)
+query_text.tag_configure("logos_tag", foreground="pink")
+
 query_text.pack()
 
 def clear_images(folder_path, max_images=250):
@@ -69,27 +75,44 @@ def clear_images(folder_path, max_images=250):
             except Exception as e:
                 print(f"Error al eliminar {file_path}: {e}")
 
-def detect_labels(path):
+def detect_labels_logos(path):
     """Detects labels in the file."""
     with open(path, "rb") as image_file:
         content = image_file.read()
 
     image = vision_v1.Image(content=content)
 
-    response = client.label_detection(image=image)
-    labels = [label.description for label in response.label_annotations]
-    query_Google = ' '.join(labels)
-    print("Query: ", query_Google)
+    response_labels = client.label_detection(image=image)
+    labels = [label.description for label in response_labels.label_annotations]
+
+    # Detectar logos
+    response_logos = client.logo_detection(image=image)
+    logos = [logo.description for logo in response_logos.logo_annotations]
+
+    # Verificar si hay logos antes de imprimir el mensaje
+    if logos:
+        # Mostrar la query en la ventana de texto
+        query_text.insert(tk.END, f"{logos}\n", "logos_tag")
+
+    # Combinar descripciones de labels y logos
+    query_Google_labels = ' '.join(labels)
+    query_Google_logos = ' '.join(logos) if logos else ''
+    query_Google_combined = f"{query_Google_labels} {query_Google_logos}"
 
     # Mostrar la query en la ventana de texto
-    query_text.insert(tk.END, f"{query_Google}\n")
+    query_text.insert(tk.END, f"{query_Google_combined}\n", "labels_tag")
 
-    retrieve_from_google(query_Google, 10)
+    retrieve_from_google(query_Google_combined, 10)
 
-    if response.error.message:
+    if response_labels.error.message:
         raise Exception(
             "{}\nFor more info on error messages, check: "
-            "https://cloud.google.com/apis/design/errors".format(response.error.message)
+            "https://cloud.google.com/apis/design/errors".format(response_labels.error.message)
+        )
+    if response_logos.error.message:
+        raise Exception(
+            "{}\nFor more info on error messages, check: "
+            "https://cloud.google.com/apis/design/errors".format(response_logos.error.message)
         )
     
 def add_browser_frame(img, frame_path='C:\\Users\\tokyo\\Desktop\\Programming\\LabArt-Google-Cloud-APIs\\Scripts\\Imagen\\browser_frame.png', border_height=35, image_offset=2):
@@ -193,7 +216,7 @@ def analyze_image():
     img_name = "Test_Image.png"
     ret, frame = cam.read()
     cv2.imwrite(img_name, frame)
-    threading.Thread(target=detect_labels, args=(img_name,)).start()
+    threading.Thread(target=detect_labels_logos, args=(img_name,)).start()
     print("{} analyzed!".format(img_name))
     start_time = time.time()
 
