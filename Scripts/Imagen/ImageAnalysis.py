@@ -51,24 +51,6 @@ query_window.attributes('-fullscreen', True)
 query_text = tk.Text(query_window, wrap=tk.WORD, width=screen_width, height=screen_height, bg='black', fg='green', font=('Arial', 14))
 query_text.pack()
 
-def add_neon_border(image_path):
-    img = Image.open(image_path)
-    
-    # Configurar el color del borde (en este caso, verde neón)
-    border_color = (0, 255, 0)  # R, G, B
-    
-    # Tamaño del borde
-    border_size = 10
-    
-    # Crear una nueva imagen con el borde
-    bordered_img = Image.new("RGB", (img.width + 2 * border_size, img.height + 2 * border_size), border_color)
-    
-    # Pegar la imagen original en el centro de la nueva imagen
-    bordered_img.paste(img, (border_size, border_size))
-    
-    return bordered_img
-
-
 def clear_images(folder_path, max_images=250):
     # Obtener la lista de todas las imágenes en el directorio
     image_files = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
@@ -109,6 +91,25 @@ def detect_labels(path):
             "{}\nFor more info on error messages, check: "
             "https://cloud.google.com/apis/design/errors".format(response.error.message)
         )
+    
+def add_browser_frame(img, frame_path='C:\\Users\\tokyo\\Desktop\\Programming\\LabArt-Google-Cloud-APIs\\Scripts\\Imagen\\browser_frame.png', border_height=35, image_offset=2):
+    # Abrir el marco del navegador
+    frame = Image.open(frame_path)
+
+    # Ajustar el tamaño del marco para que sea más alto que la imagen
+    frame = frame.resize((img.width + 5, img.height + border_height))
+
+    # Calcular la posición horizontal para centrar la imagen
+    horizontal_position = (frame.width - img.width) // 2
+
+    # Combinar la imagen original con el marco, posicionando la imagen 2 píxeles arriba del límite inferior
+    img_with_frame = Image.alpha_composite(Image.new("RGBA", frame.size, (255, 255, 255, 255)), frame)
+    img_with_frame.paste(img, (horizontal_position, border_height - image_offset))
+
+    # Convertir a formato RGB si no está en ese formato
+    img_with_frame = img_with_frame.convert('RGB')
+
+    return img_with_frame
 
 def retrieve_from_google(query, limit):
     folder_path = os.path.join(os.getcwd(), "Images")
@@ -150,10 +151,15 @@ def retrieve_from_google(query, limit):
         # Redimensionar la imagen
         img_pil = img_pil.resize((new_width, 250), Image.BILINEAR)
 
-        img_x = random.randint(0, screen_width - new_width)
-        img_y = random.randint(0, screen_height - new_height)
+        # Agregar el borde al estilo de la ventana del navegador
+        img_with_frame = add_browser_frame(img_pil)
 
-        img_google_tk = ImageTk.PhotoImage(img_pil)
+        # Calcular posición aleatoria en el lienzo
+        img_x = random.randint(0, screen_width - new_width)
+        img_y = random.randint(0, screen_height - 250)  # Usar 250 para la altura con el borde
+
+        # Mostrar la imagen en el lienzo de Tkinter
+        img_google_tk = ImageTk.PhotoImage(img_with_frame)
 
         canvas.create_image(img_x, img_y, anchor=tk.NW, image=img_google_tk)
         canvas.image = img_google_tk
