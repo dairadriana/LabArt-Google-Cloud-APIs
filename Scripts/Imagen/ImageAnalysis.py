@@ -2,6 +2,7 @@ import threading
 import cv2
 import os
 import time
+from unidecode import unidecode
 import tkinter as tk
 from google.cloud import vision_v1
 from google_images_search import GoogleImagesSearch
@@ -49,10 +50,9 @@ query_window.attributes('-fullscreen', True)
 
 # Configurar el fondo negro del widget de texto
 query_text = tk.Text(query_window, wrap=tk.WORD, width=screen_width, height=screen_height, bg='black', fg='green', font=('Arial', 14))
-# Crear un tag para el texto de labels (verde)
-query_text.tag_configure("labels_tag", foreground="green")
 
-# Crear un tag para el texto de logos (rosado)
+query_text.tag_configure("labels_tag", foreground="green")
+query_text.tag_configure("text_tag", foreground="blue")
 query_text.tag_configure("logos_tag", foreground="pink")
 
 query_text.pack()
@@ -75,8 +75,31 @@ def clear_images(folder_path, max_images=250):
             except Exception as e:
                 print(f"Error al eliminar {file_path}: {e}")
 
+def detect_text(path):
+
+    with open(path, "rb") as image_file:
+        content = image_file.read()
+
+    image = vision_v1.Image(content=content)
+
+    response_text = client.text_detection(image=image)
+    texts = [unidecode(text.description) for text in response_text.text_annotations]
+
+    # Verificar si hay texto antes de imprimir el mensaje
+    if texts:
+        query_text.insert(tk.END, f"{texts}\n", "text_tag")
+        query_Google_text = ' '.join(texts)
+
+        retrieve_from_google(query_Google_text, 10)
+
+    if response_text.error.message:
+        raise Exception(
+            "{}\nFor more info on error messages, check: "
+            "https://cloud.google.com/apis/design/errors".format(response_text.error.message)
+        )
+
 def detect_labels_logos(path):
-    """Detects labels in the file."""
+    
     with open(path, "rb") as image_file:
         content = image_file.read()
 
@@ -216,7 +239,10 @@ def analyze_image():
     img_name = "Test_Image.png"
     ret, frame = cam.read()
     cv2.imwrite(img_name, frame)
+
     threading.Thread(target=detect_labels_logos, args=(img_name,)).start()
+    threading.Thread(target=detect_text, args=(img_name,)).start()
+
     print("{} analyzed!".format(img_name))
     start_time = time.time()
 
