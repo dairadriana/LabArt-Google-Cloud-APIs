@@ -49,7 +49,7 @@ query_window.attributes('-fullscreen', True)
 query_text = tk.Text(query_window, wrap=tk.WORD, width=screen_width, height=screen_height, bg='black', fg='green', font=('Arial', 14))
 query_text.pack()
 
-def clear_images(folder_path, max_images=750):
+def clear_images(folder_path, max_images=250):
     # Obtener la lista de todas las imágenes en el directorio
     image_files = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
 
@@ -82,7 +82,7 @@ def detect_labels(path):
     # Mostrar la query en la ventana de texto
     query_text.insert(tk.END, f"{query_Google}\n")
 
-    retrieve_from_google(query_Google, 25)
+    retrieve_from_google(query_Google, 10)
 
     if response.error.message:
         raise Exception(
@@ -96,7 +96,7 @@ def retrieve_from_google(query, limit):
     folder_path = os.path.join(os.getcwd(), "Images")
 
     # Limpiar imágenes antiguas
-    clear_images(folder_path, max_images=750)
+    clear_images(folder_path, max_images=250)
 
     gis = GoogleImagesSearch('AIzaSyBm-zMIEyDd-9cyf3kzRbLCPdRit4hhjqs', 'd445dfdd970e94217')
 
@@ -139,9 +139,6 @@ def retrieve_from_google(query, limit):
         # Agregar la imagen a la lista
         image_list.append((img_google_tk, img_x, img_y))
 
-        # Esperar 1 segundo antes de pasar a la siguiente imagen
-        time.sleep(1)
-
 # Modificación en la función update_image para centrar la webcam en su espacio designado
 def update_image():
     # Mostrar el frame de la webcam en el lienzo de Tkinter
@@ -172,7 +169,7 @@ def analyze_image():
     start_time = time.time()
 
     # Programar la próxima ejecución del análisis después de un intervalo de tiempo
-    root.after(5000, analyze_image)  # 5000 milisegundos = 5 segundos
+    root.after(3000, analyze_image)  # 5000 milisegundos = 5 segundos
 
 # Iniciar el bucle de video
 def video_loop():
@@ -180,7 +177,7 @@ def video_loop():
     root.after(10, video_loop)
 
 # Iniciar automáticamente el análisis después de un intervalo de tiempo
-root.after(5000, analyze_image)  # Iniciar después de 5 segundos
+root.after(10, analyze_image)  # Iniciar después de 5 segundos
 
 # Iniciar el bucle principal de Tkinter
 video_loop()
