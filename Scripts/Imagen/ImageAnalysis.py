@@ -7,7 +7,7 @@ from google.cloud import vision_v1
 from google_images_search import GoogleImagesSearch
 from PIL import Image, ImageTk
 import requests
-from io import BytesIO
+import random
 
 # Configuración de la ventana de Tkinter
 root = tk.Tk()
@@ -31,8 +31,6 @@ cam.set(cv2.CAP_PROP_FRAME_WIDTH, new_width)
 cam.set(cv2.CAP_PROP_FRAME_HEIGHT, new_height)
 cam.set(2, vertical_position)  # Posición vertical centrada
 
-start_time = time.time()
-
 # Configurar el tamaño de la ventana principal
 root.geometry(f"{screen_width}x{screen_height}")
 
@@ -51,6 +49,24 @@ query_window.attributes('-fullscreen', True)
 query_text = tk.Text(query_window, wrap=tk.WORD, width=screen_width, height=screen_height, bg='black', fg='green', font=('Arial', 14))
 query_text.pack()
 
+def clear_images(folder_path, max_images=750):
+    # Obtener la lista de todas las imágenes en el directorio
+    image_files = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
+
+    # Ordenar las imágenes por fecha de creación (más antigua primero)
+    image_files.sort(key=lambda x: os.path.getctime(os.path.join(folder_path, x)))
+
+    # Eliminar imágenes antiguas si hay más de max_images
+    if len(image_files) > max_images:
+        images_to_delete = len(image_files) - max_images
+        for i in range(images_to_delete):
+            file_path = os.path.join(folder_path, image_files[i])
+            try:
+                os.remove(file_path)
+                print(f"Imagen eliminada: {file_path}")
+            except Exception as e:
+                print(f"Error al eliminar {file_path}: {e}")
+
 def detect_labels(path):
     """Detects labels in the file."""
     with open(path, "rb") as image_file:
@@ -66,8 +82,7 @@ def detect_labels(path):
     # Mostrar la query en la ventana de texto
     query_text.insert(tk.END, f"{query_Google}\n")
 
-    retrieve_from_google(query_Google, 1)
-    time.sleep(1)
+    retrieve_from_google(query_Google, 25)
 
     if response.error.message:
         raise Exception(
@@ -75,14 +90,16 @@ def detect_labels(path):
             "https://cloud.google.com/apis/design/errors".format(response.error.message)
         )
 
+image_list = []
 
 def retrieve_from_google(query, limit):
     folder_path = os.path.join(os.getcwd(), "Images")
 
     # Limpiar imágenes antiguas
-    clear_images(folder_path)
+    clear_images(folder_path, max_images=750)
 
     gis = GoogleImagesSearch('AIzaSyBm-zMIEyDd-9cyf3kzRbLCPdRit4hhjqs', 'd445dfdd970e94217')
+
     _search_params = {
         'q': query,
         'num': limit,
@@ -90,31 +107,40 @@ def retrieve_from_google(query, limit):
     }
 
     gis.search(search_params=_search_params, path_to_dir=folder_path)
-    first_image_url = gis.results()[0].url
 
-    # Calcular el tamaño y la posición para centrar la imagen en su espacio designado
-    img_width = screen_width // 2
-    img_height = screen_height
-    img_x = screen_width // 2
-    img_y = 0
+    # Obtener 2 resultados aleatorios
+    random_indices = random.sample(range(limit), 3)
+    image_urls = [gis.results()[i].url for i in random_indices]
 
-    # Mostrar la imagen de Google en el lienzo de Tkinter
-    img_google = Image.open(BytesIO(requests.get(first_image_url).content))
-    img_google = img_google.resize((img_width, img_height))
-    img_google_tk = ImageTk.PhotoImage(img_google)
+    for i, image_url in enumerate(image_urls):
+        # Generar un nombre único para cada imagen
+        image_name = f"image_{i}.jpg"
+        image_path = os.path.join(folder_path, image_name)
 
-    canvas.create_image(img_x, img_y, anchor=tk.NW, image=img_google_tk)
-    canvas.image = img_google_tk
+        # Guardar la imagen en la carpeta
+        with open(image_path, 'wb') as f:
+            f.write(requests.get(image_url).content)
 
-def clear_images(folder_path):
-    # Eliminar todas las imágenes en el directorio
-    for file_name in os.listdir(folder_path):
-        file_path = os.path.join(folder_path, file_name)
-        try:
-            if os.path.isfile(file_path):
-                os.remove(file_path)
-        except Exception as e:
-            print(f"Error al eliminar {file_path}: {e}")
+        # Calcular posición aleatoria en el lienzo
+        img_width = screen_width // 2
+        img_height = screen_height
+        img_x = random.randint(0, screen_width - img_width)
+        img_y = random.randint(0, screen_height - img_height)
+
+        # Mostrar la imagen en el lienzo de Tkinter
+        img_google = Image.open(image_path)
+        img_google = img_google.resize((img_width, img_height))
+        img_google_tk = ImageTk.PhotoImage(img_google)
+
+        canvas.create_image(img_x, img_y, anchor=tk.NW, image=img_google_tk)
+        canvas.image = img_google_tk
+        root.update()
+
+        # Agregar la imagen a la lista
+        image_list.append((img_google_tk, img_x, img_y))
+
+        # Esperar 1 segundo antes de pasar a la siguiente imagen
+        time.sleep(1)
 
 # Modificación en la función update_image para centrar la webcam en su espacio designado
 def update_image():
