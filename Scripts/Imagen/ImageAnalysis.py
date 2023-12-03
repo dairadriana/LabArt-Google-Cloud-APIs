@@ -8,15 +8,19 @@ from google.cloud import vision_v1
 from google_images_search import GoogleImagesSearch
 from PIL import Image, ImageTk
 import requests
+from screeninfo import get_monitors
 import random
 
 # Configuración de la ventana de Tkinter
 root = tk.Tk()
-root.title("Webcam and Image Viewer")
+root.title("Image Viewer")
+
+# Obtener información sobre los monitores
+monitors = get_monitors()
 
 # Tamaño de la ventana
-screen_width = root.winfo_screenwidth()
-screen_height = root.winfo_screenheight()
+screen_width = monitors[0].width
+screen_height = monitors[0].height
 
 # Cliente de visión AI
 client = vision_v1.ImageAnnotatorClient()
@@ -34,8 +38,7 @@ cam.set(cv2.CAP_PROP_FRAME_WIDTH, new_width)
 cam.set(cv2.CAP_PROP_FRAME_HEIGHT, new_height)
 cam.set(2, vertical_position)  # Posición vertical centrada
 
-# Configurar el tamaño de la ventana principal
-root.geometry(f"{screen_width}x{screen_height}")
+root.geometry(f"{monitors[0].width}x{monitors[0].height}+0+0")
 
 # Crear un lienzo para mostrar la imagen y el video
 canvas = tk.Canvas(root, width=screen_width, height=screen_height)
@@ -45,9 +48,6 @@ canvas.pack()
 query_window = tk.Toplevel(root)
 query_window.title("Queries")
 
-# Configurar la ventana de queries para ocupar toda la pantalla
-query_window.attributes('-fullscreen', True)
-
 # Configurar el fondo negro del widget de texto
 query_text = tk.Text(query_window, wrap=tk.WORD, width=screen_width, height=screen_height, bg='black', fg='green', font=('Arial', 14))
 
@@ -56,6 +56,9 @@ query_text.tag_configure("text_tag", foreground="blue")
 query_text.tag_configure("logos_tag", foreground="pink")
 
 query_text.pack()
+
+query_window.geometry(f"{monitors[1].width}x{monitors[1].height}+{monitors[1].x}+{monitors[1].y}")
+
 
 def clear_images(folder_path, max_images=250):
     # Obtener la lista de todas las imágenes en el directorio
@@ -214,25 +217,6 @@ def retrieve_from_google(query, limit):
         # Agregar la imagen a la lista
         image_list.append((img_google_tk, img_x, img_y))
 
-# Modificación en la función update_image para centrar la webcam en su espacio designado
-def update_image():
-    # Mostrar el frame de la webcam en el lienzo de Tkinter
-    ret, frame = cam.read()
-    cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
-    # Calcular el tamaño y la posición para centrar la webcam en su espacio designado
-    img_width = new_width
-    img_height = new_height
-    img_x = 0  # Izquierda
-    img_y = 0
-
-    img = Image.fromarray(cv2image)
-    img = img.resize((img_width, img_height))  # Ajustar el tamaño de la imagen sin antialiasing
-    img_tk = ImageTk.PhotoImage(img)
-
-    canvas.create_image(img_x, img_y, anchor=tk.NW, image=img_tk)
-    canvas.img_tk = img_tk
-
 def analyze_image():
     global start_time
 
@@ -251,7 +235,7 @@ def analyze_image():
 
 # Iniciar el bucle de video
 def video_loop():
-    update_image()
+    #update_image()
     root.after(10, video_loop)
 
 # Iniciar automáticamente el análisis después de un intervalo de tiempo
