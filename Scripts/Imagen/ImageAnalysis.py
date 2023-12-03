@@ -91,6 +91,8 @@ def detect_text(path):
     # Verificar si hay texto antes de imprimir el mensaje
     if texts:
         query_text.insert(tk.END, f"{texts}\n", "text_tag")
+        query_text.update_idletasks()  # Actualizar tareas pendientes
+        query_text.yview(tk.END)
         query_Google_text = ' '.join(texts)
 
         retrieve_from_google(query_Google_text, 10)
@@ -119,6 +121,8 @@ def detect_labels_logos(path):
     if logos:
         # Mostrar la query en la ventana de texto
         query_text.insert(tk.END, f"{logos}\n", "logos_tag")
+        query_text.update_idletasks()  # Actualizar tareas pendientes
+        query_text.yview(tk.END)
 
     # Combinar descripciones de labels y logos
     query_Google_labels = ' '.join(labels)
@@ -238,13 +242,22 @@ def video_loop():
     #update_image()
     root.after(10, video_loop)
 
+def exit_program(event):
+    root.destroy()  # Cierra la ventana principal de Tkinter, lo que terminará el programa
+
+# Asociar la pulsación de la tecla "q" con la función exit_program
+root.bind('<KeyPress-q>', exit_program)
+
+def on_closing():
+    cam.release()
+    cv2.destroyAllWindows()
+    root.destroy()
+
+root.protocol("WM_DELETE_WINDOW", on_closing)
+
 # Iniciar automáticamente el análisis después de un intervalo de tiempo
 root.after(10, analyze_image)  # Iniciar después de 5 segundos
 
 # Iniciar el bucle principal de Tkinter
 video_loop()
 root.mainloop()
-
-# Liberar la cámara al salir
-cam.release()
-cv2.destroyAllWindows()
